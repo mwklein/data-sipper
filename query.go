@@ -1,0 +1,189 @@
+package datasipper
+
+import (
+	"bytes"
+	"database/sql"
+	"encoding/gob"
+	"errors"
+	"fmt"
+	"time"
+
+	// Imports the Couchbase driver
+	_ "github.com/couchbase/go_n1ql"
+	// Imports the MySQL driver
+	_ "github.com/go-sql-driver/mysql"
+	// Imports the Postgres SQL driver
+	_ "github.com/lib/pq"
+)
+
+// DbConfig represents the basic configuration necessary to connect
+// to the database.
+type DbConfig struct {
+	dbType      string
+	hostname    string
+	port        int
+	dbName      string
+	schemaName  string
+	username    string
+	password    string
+	QueryParams *[]byte
+	Conn        *sql.DB
+}
+
+// DefaultConfig returns a new Config instance with defaults populated
+// The default configuration is:
+//
+//   * dbType: "mysql"
+//	 * hostname: "127.0.0.1"
+//	 * port: 3306
+//   * dbName: "Northwind"
+//   * schemaName: "dbo"
+//	 * usernmae: "jsmith"
+//	 * password: ""
+func DefaultConfig() DbConfig {
+	var defaultConfig = DbConfig{
+		dbType:     "mysql",
+		hostname:   "localhost",
+		port:       3306,
+		dbName:     "Northwind",
+		schemaName: "dbo",
+		username:   "jsmith",
+		password:   "",
+	}
+	return defaultConfig
+}
+
+// ExecuteQuery executes the provided SQL query and provides a JSON representation
+// of the returned dataset
+//
+// params -keys: sql
+func (db *DbConfig) ExecuteQuery(sql string) ([]interface{}, error) {
+	err := connectionFactory(db)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.Conn.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return makeStructJSON(rows)
+}
+
+// Close closes the underlying database connection
+func (db *DbConfig) Close() error {
+	var status = *new(error)
+	if db.Conn != nil {
+		status = db.Conn.Close()
+	}
+	return status
+}
+
+// private function to build the connection to the database
+func connectionFactory(config *DbConfig) error {
+	if config.Conn != nil {
+		return nil
+	}
+
+	var db *sql.DB
+	var err error
+
+	switch config.dbType {
+	case "mysql":
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
+			config.username,
+			config.password,
+			config.hostname,
+			config.port,
+			config.dbName)
+		db, err = sql.Open("mysql", dsn)
+
+	case "postgres":
+		dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			config.username,
+			config.password,
+			config.hostname,
+			config.port,
+			config.dbName)
+		db, err = sql.Open("postgres", dsn)
+
+	case "couchbase":
+		dsn := fmt.Sprintf("%s:%d",
+			config.hostname,
+			config.port)
+		db, err = sql.Open("postgres", dsn)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	config.Conn = db
+
+	return nil
+}
+
+// private function to convert result sets from the DB into JSON objects
+func makeStructJSON(rows *sql.Rows) ([]interface{}, error) {
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	count := len(columns)
+	values := make([]interface{}, count)
+	scanArgs := make([]interface{}, count)
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	masterData := make([]interface{}, 0)
+
+	for rows.Next() {
+		curRow := make(map[string]interface{})
+		err := rows.Scan(scanArgs...)
+		if err != nil {
+			return nil, err
+		}
+		for i, v := range values {
+			switch t := v.(type) {
+			case nil:
+				curRow[columns[i]] = nil
+			case bool:
+				if t {
+					curRow[columns[i]] = true
+				} else {
+					curRow[columns[i]] = false
+				}
+			case int:
+				curRow[columns[i]] = t
+			case string:
+				curRow[columns[i]] = t
+			case time.Time:
+				curRow[columns[i]] = t.Format("2006-01-02 15:04:05.999")
+			case []byte:
+				curRow[columns[i]] = string(t)
+			default:
+				fmt.Printf("Row=%d cname=%s type=%s value=%s\n", len(masterData), columns[i], t, v)
+				return nil, errors.New("Unknown DB Type to convert to JSON")
+			}
+
+		}
+		masterData = append(masterData, curRow)
+	}
+	return masterData, nil
+}
+
+// private function to convert arbitrary interface into a byte array
+func getBytes(key interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(key)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
