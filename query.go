@@ -30,7 +30,7 @@ type DbConfig struct {
 	Conn        *sql.DB
 }
 
-// DefaultConfig returns a new Config instance with defaults populated
+// DefaultDbConfig returns a new Config instance with defaults populated
 // The default configuration is:
 //
 //   * dbType: "mysql"
@@ -40,7 +40,7 @@ type DbConfig struct {
 //   * schemaName: "dbo"
 //	 * usernmae: "jsmith"
 //	 * password: ""
-func DefaultConfig() DbConfig {
+func DefaultDbConfig() DbConfig {
 	var defaultConfig = DbConfig{
 		dbType:     "mysql",
 		hostname:   "localhost",

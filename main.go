@@ -14,7 +14,7 @@ func main() {
 	//fmt.Println(argsWithoutProg)
 	//fmt.Println(arg)
 
-	db := DefaultConfig()
+	db := DefaultDbConfig()
 	j, err := db.ExecuteQuery("SELECT * FROM table")
 	if err != nil {
 		panic(err)

@@ -10,7 +10,7 @@ import (
 
 // private function to create a mock DB connection to be used
 // for testing cross-database functions
-func createConfig() (*DbConfig, sqlmock.Sqlmock, error) {
+func createDbConfig() (*DbConfig, sqlmock.Sqlmock, error) {
 	config := new(DbConfig)
 
 	db, mock, err := sqlmock.New()
@@ -25,7 +25,7 @@ func createConfig() (*DbConfig, sqlmock.Sqlmock, error) {
 
 func TestExecuteQuery_Generic(t *testing.T) {
 	// create a mock DB config
-	db, mock, err := createConfig()
+	db, mock, err := createDbConfig()
 	if err != nil {
 		return
 	}
@@ -85,7 +85,7 @@ func TestExecuteQuery_Generic(t *testing.T) {
 }
 
 func TestExecuteQuery_MySQL(t *testing.T) {
-	db := DefaultConfig()
+	db := DefaultDbConfig()
 	db.dbName = "ds_test"
 	db.hostname = "10.211.55.10"
 	db.username = "root"
@@ -107,7 +107,7 @@ func TestExecuteQuery_MySQL(t *testing.T) {
 }
 
 func TestExecuteQuery_Postgres(t *testing.T) {
-	db := DefaultConfig()
+	db := DefaultDbConfig()
 	db.dbType = "postgres"
 	db.hostname = "10.211.55.10"
 	db.port = 5432
@@ -131,7 +131,7 @@ func TestExecuteQuery_Postgres(t *testing.T) {
 }
 
 func TestExecuteQuery_Couchbase(t *testing.T) {
-	db := DefaultConfig()
+	db := DefaultDbConfig()
 	db.dbType = "couchbase"
 	db.hostname = "10.211.55.10"
 	db.port = 8091
@@ -152,6 +152,6 @@ func TestExecuteQuery_Couchbase(t *testing.T) {
 }
 
 func TestClose(t *testing.T) {
-	db, _, _ := createConfig()
+	db, _, _ := createDbConfig()
 	db.Close()
 }

@@ -10,7 +10,7 @@ func TestMainArgs(t *testing.T) {
 	//defer func() { os.Args = oldArgs }()
 
 	//os.Args = []string{"data-sipper-poc-datasource", "-user=bla"}
-	main()
+	//main()
 
 	/*actual := main()
 
