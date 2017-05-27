@@ -1,4 +1,4 @@
-package datasipper
+package main
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 // to connect to the upload server
 func createUploadConfig(t *testing.T) (UploadConfig, error) {
 	config := DefaultUploadConfig()
-	os.Setenv("DATASIPPER_SITE_URL", "https://cb2qlbg2j9.execute-api.us-east-1.amazonaws.com/dev")
+	os.Setenv("DATASIPPER_SITE_URL", "https://fgk7jlmhkk.execute-api.us-east-1.amazonaws.com/dev")
 	if os.Getenv("DATASIPPER_SITE_URL") == "" {
 		t.Errorf("test canceled; $DATASIPPER_SITE_URL not set")
 	}

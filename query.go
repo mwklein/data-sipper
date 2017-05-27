@@ -1,4 +1,4 @@
-package datasipper
+package main
 
 import (
 	"bytes"
@@ -34,23 +34,29 @@ type DbConfig struct {
 // The default configuration is:
 //
 //   * dbType: "mysql"
-//	 * hostname: "127.0.0.1"
+//	 * hostname: "localhost"
 //	 * port: 3306
-//   * dbName: "Northwind"
-//   * schemaName: "dbo"
-//	 * usernmae: "jsmith"
-//	 * password: ""
 func DefaultDbConfig() DbConfig {
 	var defaultConfig = DbConfig{
-		dbType:     "mysql",
-		hostname:   "localhost",
-		port:       3306,
-		dbName:     "Northwind",
-		schemaName: "dbo",
-		username:   "jsmith",
-		password:   "",
+		dbType:   "mysql",
+		hostname: "localhost",
+		port:     3306,
 	}
 	return defaultConfig
+}
+
+func (db *DbConfig) ConfigValid() bool {
+	rtnVal bool = false
+
+	if db.dbType=="mysql" 
+		&& len(db.hostname) > 4
+		&& db.port > 0
+		&& len(db.username) > 1
+		&& len(db.password) > 1 {
+			return true
+		}
+
+	return rtnVal
 }
 
 // ExecuteQuery executes the provided SQL query and provides a JSON representation

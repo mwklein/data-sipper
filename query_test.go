@@ -1,4 +1,4 @@
-package datasipper
+package main
 
 import (
 	"encoding/json"
