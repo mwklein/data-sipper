@@ -26,4 +26,4 @@ services:
       - "1433:1433"
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "rootpwd"
+      SA_PASSWORD: "R00t@ssw0rd"

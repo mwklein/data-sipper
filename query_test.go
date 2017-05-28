@@ -134,11 +134,13 @@ func TestExecuteQuery_Postgres(t *testing.T) {
 
 func TestExecuteQuery_MSSQL(t *testing.T) {
 	db := DefaultDbConfig()
-	db.dbType = "couchbase"
+	db.dbType = "mssql"
 	db.hostname = os.Getenv("DATASIPPER_DB_HOSTNAME")
-	db.port = 8091
+	db.port = 1433
+	db.username = "sa"
+	db.password = "R00t@ssw0rd"
 
-	results, err := db.ExecuteQuery("select * from contacts where contacts.name = \"dave\"")
+	results, err := db.ExecuteQuery("SELECT name FROM sys.tables")
 	if err != nil {
 		t.Errorf("execute query function returned '%s'", err)
 	}

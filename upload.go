@@ -26,7 +26,8 @@ type UploadConfig struct {
 	Ctx             ctx.Context
 }
 
-// ConfigValid returns
+// ConfigValid returns if the required fields for the upload configuration
+// have been populated. 
 func (up *UploadConfig) ConfigValid() bool {
 	rtnVal := false
 

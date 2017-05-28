@@ -14,6 +14,8 @@ import (
 	_ "github.com/lib/pq"
 	// Imports the MS SQL Server driver
 	_ "github.com/denisenkom/go-mssqldb"
+	// Imports the SQL Lite driver
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // DbConfig represents the basic configuration necessary to connect
@@ -22,6 +24,7 @@ type DbConfig struct {
 	dbType      string
 	hostname    string
 	port        int
+	filePath    string
 	dbName      string
 	schemaName  string
 	username    string
@@ -74,6 +77,11 @@ func (db *DbConfig) ConfigValid() bool {
 		len(db.dbName) > 1 &&
 		len(db.username) > 1 &&
 		len(db.password) > 1 {
+		return true
+	}
+
+	if db.dbType == "sqlite3" &&
+		len(db.filePath) > 0
 		return true
 	}
 
@@ -135,7 +143,6 @@ func connectionFactory(config *DbConfig) error {
 			config.port,
 			config.dbName)
 		db, err = sql.Open("postgres", dsn)
-	}
 
 	case "mssql":
 		dsn := fmt.Sprintf("sqlserver://%s:%s@%s:%d/%s",
@@ -145,6 +152,11 @@ func connectionFactory(config *DbConfig) error {
 			config.port,
 			config.dbName)
 		db, err = sql.Open("mssql", dsn)
+
+	case "sqlite3":
+		dsn := fmt.Sprintf("%s",
+			config.filePath)
+		db, err = sql.Open("sqlite3", dsn)
 	}
 
 	if err != nil {
