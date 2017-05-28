@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"time"
 
-	// Imports the Couchbase driver
-	_ "github.com/couchbase/go_n1ql"
 	// Imports the MySQL driver
 	_ "github.com/go-sql-driver/mysql"
 	// Imports the Postgres SQL driver
 	_ "github.com/lib/pq"
+	// Imports the MS SQL Server driver
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 // DbConfig represents the basic configuration necessary to connect
@@ -45,16 +45,37 @@ func DefaultDbConfig() DbConfig {
 	return defaultConfig
 }
 
+// ConfigValid returns if the required fields for the given database type
+// have been populated.
 func (db *DbConfig) ConfigValid() bool {
-	rtnVal bool = false
+	rtnVal := false
 
-	if db.dbType=="mysql" 
-		&& len(db.hostname) > 4
-		&& db.port > 0
-		&& len(db.username) > 1
-		&& len(db.password) > 1 {
-			return true
-		}
+	if db.dbType == "mysql" &&
+		len(db.hostname) > 4 &&
+		db.port > 0 &&
+		len(db.dbName) > 1 &&
+		len(db.username) > 1 &&
+		len(db.password) > 1 {
+		return true
+	}
+
+	if db.dbType == "postgres" &&
+		len(db.hostname) > 4 &&
+		db.port > 0 &&
+		len(db.dbName) > 1 &&
+		len(db.username) > 1 &&
+		len(db.password) > 1 {
+		return true
+	}
+
+	if db.dbType == "mssql" &&
+		len(db.hostname) > 4 &&
+		db.port > 0 &&
+		len(db.dbName) > 1 &&
+		len(db.username) > 1 &&
+		len(db.password) > 1 {
+		return true
+	}
 
 	return rtnVal
 }
@@ -114,12 +135,16 @@ func connectionFactory(config *DbConfig) error {
 			config.port,
 			config.dbName)
 		db, err = sql.Open("postgres", dsn)
+	}
 
-	case "couchbase":
-		dsn := fmt.Sprintf("%s:%d",
+	case "mssql":
+		dsn := fmt.Sprintf("sqlserver://%s:%s@%s:%d/%s",
+			config.username,
+			config.password,
 			config.hostname,
-			config.port)
-		db, err = sql.Open("postgres", dsn)
+			config.port,
+			config.dbName)
+		db, err = sql.Open("mssql", dsn)
 	}
 
 	if err != nil {

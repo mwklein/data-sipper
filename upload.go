@@ -26,6 +26,19 @@ type UploadConfig struct {
 	Ctx             ctx.Context
 }
 
+// ConfigValid returns
+func (up *UploadConfig) ConfigValid() bool {
+	rtnVal := false
+
+	if len(up.SiteURL) > 5 &&
+		len(up.EndpointURI) > 3 &&
+		len(up.UserAgent) > 0 {
+		return true
+	}
+
+	return rtnVal
+}
+
 // DefaultUploadConfig returns a new Config instance with defaults populated
 // The default configuration is:
 //

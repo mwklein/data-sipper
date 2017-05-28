@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"os"
+
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
 
@@ -87,9 +89,9 @@ func TestExecuteQuery_Generic(t *testing.T) {
 func TestExecuteQuery_MySQL(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbName = "ds_test"
-	db.hostname = "10.211.55.10"
-	db.username = "root"
-	db.password = "rootpwd"
+	db.hostname = os.Getenv("DATASIPPER_DB_HOSTNAME")
+	db.username = "testuser"
+	db.password = "testpwd"
 
 	results, err := db.ExecuteQuery("SELECT * FROM information_schema.tables")
 	if err != nil {
@@ -109,7 +111,7 @@ func TestExecuteQuery_MySQL(t *testing.T) {
 func TestExecuteQuery_Postgres(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbType = "postgres"
-	db.hostname = "10.211.55.10"
+	db.hostname = os.Getenv("DATASIPPER_DB_HOSTNAME")
 	db.port = 5432
 	db.dbName = "ds_test"
 	db.username = "testuser"
@@ -130,10 +132,10 @@ func TestExecuteQuery_Postgres(t *testing.T) {
 	fmt.Printf("%s\n", b)
 }
 
-func TestExecuteQuery_Couchbase(t *testing.T) {
+func TestExecuteQuery_MSSQL(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbType = "couchbase"
-	db.hostname = "10.211.55.10"
+	db.hostname = os.Getenv("DATASIPPER_DB_HOSTNAME")
 	db.port = 8091
 
 	results, err := db.ExecuteQuery("select * from contacts where contacts.name = \"dave\"")

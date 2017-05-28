@@ -20,11 +20,10 @@ services:
     ports:
       - "5432:5432"
 
-  couchbase:
-    image: couchbase
-    network_mode: "host"
+  mssql:
+    image: "microsoft/mssql-server-linux"
     ports:
-      - 8091:8091
-      - 8092:8092
-      - 8093:8093
-      - 11210:11210
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "rootpwd"

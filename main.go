@@ -1,11 +1,14 @@
 package main
 
 import (
+	"errors"
 	"net/url"
 	"os"
 
-	"errors"
+	"fmt"
+	"time"
 
+	toml "github.com/BurntSushi/toml"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -13,7 +16,7 @@ import (
 var opts struct {
 	ConfigFilePath string `short:"c" long:"config-file" description:"The configuration file for the data-sipper client"`
 
-	DbType string `short:"t" long:"db-type" description:"The type of database in which to connect" choice:"mysql" choice:"postgres" choice:"couchbase" default:"mysql" env:"DATASIPPER_DB_TYPE"`
+	DbType string `short:"t" long:"db-type" description:"The type of database in which to connect" choice:"mysql" choice:"postgres" choice:"mssql" default:"mysql" env:"DATASIPPER_DB_TYPE"`
 
 	DbHostname string `short:"h" long:"db-host" description:"The hostname or IP adress of the database server" default:"localhost"  env:"DATASIPPER_DB_HOSTNAME"`
 
@@ -30,24 +33,40 @@ var opts struct {
 	EndpointURL string `short:"s" long:"server" description:"The URL of the server's REST endpoint"  env:"DATASIPPER_SERVER_URL"`
 }
 
+// main is the primary entry point to the application
 func main() {
 	args := os.Args
 
+	// Load command line arguments
 	args, err := flags.ParseArgs(&opts, args)
 	if err != nil {
-		os.Exit(1)
+		errorExit(err)
 	}
 
+	// Load values from a configuration file
+	if len(opts.ConfigFilePath) > 0 {
+		_, err := os.Stat(opts.ConfigFilePath)
+		if err != nil {
+			errorExit(err)
+		}
+
+		if _, err := toml.DecodeFile(opts.ConfigFilePath, &opts); err != nil {
+			errorExit(err)
+		}
+	}
+
+	// Set the configuration for the DB
 	db := DefaultDbConfig()
-	db.dbType = getFirst(opts.DbType, db.dbType)
-	db.hostname = getFirst(opts.DbHostname, db.hostname)
-	db.dbName = getFirst(opts.DbName, db.dbName)
-	db.username = getFirst(opts.DbUsername, db.username)
-	db.password = getFirst(opts.DbPassword, db.password)
+	db.dbType = opts.DbType
+	db.hostname = opts.DbHostname
+	db.dbName = opts.DbName
+	db.username = opts.DbUsername
+	db.password = opts.DbPassword
 	if opts.DbPort > 0 {
 		db.port = opts.DbPort
 	}
 
+	// Set the configuration for the uplaod server
 	up := DefaultUploadConfig()
 	u, err := url.Parse(opts.EndpointURL)
 	if err != nil {
@@ -55,24 +74,34 @@ func main() {
 		up.EndpointURI = u.Path
 	}
 
+	// Execute the database query
 	if !db.ConfigValid() {
-		panic(errors.New("Database configuration is not valid"))
+		//fmt.Printf("%v\n", flags.PrintErrors())
+		errorExit(errors.New("Database configuration is not valid"))
 	}
-
 	rows, err := db.ExecuteQuery(opts.DbQuery)
 	if err != nil {
-		panic(err)
+		errorExit(err)
 	}
 
+	// Execute the upload to the server
 	if !up.ConfigValid() {
-		panic(errors.New("Server configuration is not valid"))
+		errorExit(errors.New("Server configuration is not valid"))
 	}
-	up.UploadResults(rows)
+	err = up.UploadResults(&rows)
+	if err != nil {
+		errorExit(err)
+	}
+
+	// Return successful application execution
+	t := time.Now()
+	fmt.Printf("%v - SUCCESS: Successfully uploaded %v rows\n", t.Format(time.RFC3339), len(rows))
+	os.Exit(0)
 }
 
-func getFirst(str1 string, str2 string) string {
-	if len(str1) > 0 {
-		return str1
-	}
-	return str2
+// private function to exit the application in an error state
+func errorExit(err error) {
+	t := time.Now()
+	fmt.Printf("%v - ERROR: %v\n", t.Format(time.RFC3339), err)
+	os.Exit(1)
 }
