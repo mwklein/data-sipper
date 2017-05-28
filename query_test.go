@@ -155,6 +155,26 @@ func TestExecuteQuery_MSSQL(t *testing.T) {
 	fmt.Printf("%s\n", b)
 }
 
+func TestExecuteQuery_Sqlite3(t *testing.T) {
+	db := DefaultDbConfig()
+	db.dbType = "sqlite3"
+	db.filePath = "./sqlite3_test.db"
+
+	results, err := db.ExecuteQuery("SELECT name FROM sys.tables")
+	if err != nil {
+		t.Errorf("execute query function returned '%s'", err)
+	}
+
+	// verify JSON marshalling works appropriately
+	b, err := json.MarshalIndent(&results, "", "   ")
+	if err != nil {
+		t.Errorf("error '%s' received when marshaling to JSON", err)
+	}
+
+	// print tested JSON
+	fmt.Printf("%s\n", b)
+}
+
 func TestClose(t *testing.T) {
 	db, _, _ := createDbConfig()
 	db.Close()
