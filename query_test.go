@@ -160,7 +160,7 @@ func TestExecuteQuery_Sqlite3(t *testing.T) {
 	db.dbType = "sqlite3"
 	db.filePath = "./sqlite3_test.db"
 
-	results, err := db.ExecuteQuery("SELECT name FROM sys.tables")
+	results, err := db.ExecuteQuery("SELECT * FROM sqlite_master WHERE type='table'")
 	if err != nil {
 		t.Errorf("execute query function returned '%s'", err)
 	}
@@ -174,6 +174,29 @@ func TestExecuteQuery_Sqlite3(t *testing.T) {
 	// print tested JSON
 	fmt.Printf("%s\n", b)
 }
+
+/*func TestExecuteQuery_Oracle(t *testing.T) {
+	db := DefaultDbConfig()
+	db.dbType = "ora"
+	db.hostname = os.Getenv("DATASIPPER_DB_HOSTNAME")
+	db.port = 1521
+	db.username = "system"
+	db.password = "oracle"
+
+	results, err := db.ExecuteQuery("SELECT owner, table_name FROM dba_tables")
+	if err != nil {
+		t.Errorf("execute query function returned '%s'", err)
+	}
+
+	// verify JSON marshalling works appropriately
+	b, err := json.MarshalIndent(&results, "", "   ")
+	if err != nil {
+		t.Errorf("error '%s' received when marshaling to JSON", err)
+	}
+
+	// print tested JSON
+	fmt.Printf("%s\n", b)
+}*/
 
 func TestClose(t *testing.T) {
 	db, _, _ := createDbConfig()

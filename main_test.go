@@ -12,9 +12,6 @@ func TestMainArgs(t *testing.T) {
 	//os.Args = []string{"data-sipper-poc-datasource", "-user=bla"}
 	//main()
 
-	/*actual := main()
+	main()
 
-	if actual != expected {
-		t.Errorf("Test failed, expected: '%s', got:  '%s'", expected, actual)
-	}*/
 }

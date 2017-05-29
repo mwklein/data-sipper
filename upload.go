@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	ctx "golang.org/x/net/context"
@@ -16,8 +17,7 @@ import (
 // UploadConfig represents the basic configuration necessary to connect
 // to the database.
 type UploadConfig struct {
-	SiteURL         string
-	EndpointURI     string
+	SiteURL         *url.URL
 	ClientID        string
 	ClientSecret    string
 	TokenURI        string
@@ -27,12 +27,11 @@ type UploadConfig struct {
 }
 
 // ConfigValid returns if the required fields for the upload configuration
-// have been populated. 
+// have been populated.
 func (up *UploadConfig) ConfigValid() bool {
 	rtnVal := false
 
-	if len(up.SiteURL) > 5 &&
-		len(up.EndpointURI) > 3 &&
+	if up != nil &&
 		len(up.UserAgent) > 0 {
 		return true
 	}
@@ -46,8 +45,7 @@ func (up *UploadConfig) ConfigValid() bool {
 //   * EndpointURI: ""
 func DefaultUploadConfig() UploadConfig {
 	var defaultConfig = UploadConfig{
-		EndpointURI: "/data/append",
-		UserAgent:   "datasipper-poc@0.0.1",
+		UserAgent: "datasipper-poc@0.0.1",
 	}
 
 	c, _ := ctx.WithCancel(ctx.Background())
@@ -60,12 +58,12 @@ func DefaultUploadConfig() UploadConfig {
 //
 // params -keys: rows
 func (up *UploadConfig) UploadResults(rows *[]interface{}) error {
-	_, err := up.apiRequest("POST", up.EndpointURI, rows)
+	_, err := up.apiRequest("POST", rows)
 	return err
 }
 
 // Private function to execute API requests
-func (up *UploadConfig) apiRequest(method string, path string, params *[]interface{}) (map[string]interface{}, error) {
+func (up *UploadConfig) apiRequest(method string, params *[]interface{}) (map[string]interface{}, error) {
 
 	var httpClient *http.Client
 
@@ -75,7 +73,7 @@ func (up *UploadConfig) apiRequest(method string, path string, params *[]interfa
 		oauth := &clientcredentials.Config{
 			ClientID:     up.ClientID,
 			ClientSecret: up.ClientSecret,
-			TokenURL:     up.SiteURL + up.TokenURI,
+			TokenURL:     up.SiteURL.Scheme + "://" + up.SiteURL.Host + up.TokenURI,
 		}
 
 		// Use base oauth configuration to build an HTTP client which will automatically manage
@@ -96,7 +94,7 @@ func (up *UploadConfig) apiRequest(method string, path string, params *[]interfa
 		}
 
 		// Build the POST/PUT request with the body streamed via a bytes.Buffer
-		req, err = http.NewRequest(method, up.SiteURL+up.EndpointURI, bytes.NewBuffer(ba))
+		req, err = http.NewRequest(method, up.SiteURL.String(), bytes.NewBuffer(ba))
 		if err != nil {
 			return nil, err
 		}

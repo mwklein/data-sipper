@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -10,12 +11,17 @@ import (
 // to connect to the upload server
 func createUploadConfig(t *testing.T) (UploadConfig, error) {
 	config := DefaultUploadConfig()
-	os.Setenv("DATASIPPER_SITE_URL", "https://fgk7jlmhkk.execute-api.us-east-1.amazonaws.com/dev")
-	if os.Getenv("DATASIPPER_SITE_URL") == "" {
-		t.Errorf("test canceled; $DATASIPPER_SITE_URL not set")
+	svrURL := os.Getenv("DATASIPPER_SERVER_URL")
+	if len(svrURL) < 5 {
+		t.Errorf("test canceled; $DATASIPPER_SERVER_URL not set")
 	}
 
-	config.SiteURL = os.Getenv("DATASIPPER_SITE_URL")
+	var err error
+	config.SiteURL, err = url.Parse(svrURL)
+	if err != nil {
+		t.Errorf("test canceled; could not parse URL: %s\n", svrURL)
+	}
+
 	return config, nil
 }
 

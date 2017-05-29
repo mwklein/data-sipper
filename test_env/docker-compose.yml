@@ -27,3 +27,9 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "R00t@ssw0rd"
+
+#  oracle:
+#    image: "dap1995/oracle-database"
+#    ports:
+#      - "8080:8080"
+#      - "1521:1521"

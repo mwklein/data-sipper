@@ -81,7 +81,16 @@ func (db *DbConfig) ConfigValid() bool {
 	}
 
 	if db.dbType == "sqlite3" &&
-		len(db.filePath) > 0
+		len(db.filePath) > 0 {
+		return true
+	}
+
+	if db.dbType == "ora" &&
+		len(db.hostname) > 4 &&
+		db.port > 0 &&
+		len(db.dbName) > 1 &&
+		len(db.username) > 1 &&
+		len(db.password) > 1 {
 		return true
 	}
 
@@ -157,6 +166,15 @@ func connectionFactory(config *DbConfig) error {
 		dsn := fmt.Sprintf("%s",
 			config.filePath)
 		db, err = sql.Open("sqlite3", dsn)
+
+	case "ora":
+		dsn := fmt.Sprintf("%s/%s@%s:%d/%s",
+			config.username,
+			config.password,
+			config.hostname,
+			config.port,
+			config.dbName)
+		db, err = sql.Open("ora", dsn)
 	}
 
 	if err != nil {
@@ -201,7 +219,7 @@ func makeStructJSON(rows *sql.Rows) ([]interface{}, error) {
 				} else {
 					curRow[columns[i]] = false
 				}
-			case int:
+			case int, int8, int16, int32, int64:
 				curRow[columns[i]] = t
 			case string:
 				curRow[columns[i]] = t

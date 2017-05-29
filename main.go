@@ -16,11 +16,13 @@ import (
 var opts struct {
 	ConfigFilePath string `short:"c" long:"config-file" description:"The configuration file for the data-sipper client"`
 
-	DbType string `short:"t" long:"db-type" description:"The type of database in which to connect" choice:"mysql" choice:"postgres" choice:"mssql" default:"mysql" env:"DATASIPPER_DB_TYPE"`
+	DbType string `short:"t" long:"db-type" description:"The type of database in which to connect" choice:"mysql" choice:"postgres" choice:"mssql" choice:"sqlite3" default:"mysql" env:"DATASIPPER_DB_TYPE"`
 
 	DbHostname string `short:"h" long:"db-host" description:"The hostname or IP adress of the database server" default:"localhost"  env:"DATASIPPER_DB_HOSTNAME"`
 
 	DbPort int `short:"r" long:"db-port" description:"The TCP port of the database server" default:"3306"  env:"DATASIPPER_DB_PORT"`
+
+	DbFilePath string `short:"f" long:"db-file-path" description:"The file path to the database" env:"DATASIPPER_DB_FILE_PATH"`
 
 	DbName string `short:"d" long:"db-name" description:"The name of the database or cluster"  env:"DATASIPPER_DB_NAME"`
 
@@ -59,6 +61,7 @@ func main() {
 	db := DefaultDbConfig()
 	db.dbType = opts.DbType
 	db.hostname = opts.DbHostname
+	db.filePath = opts.DbFilePath
 	db.dbName = opts.DbName
 	db.username = opts.DbUsername
 	db.password = opts.DbPassword
@@ -68,10 +71,9 @@ func main() {
 
 	// Set the configuration for the uplaod server
 	up := DefaultUploadConfig()
-	u, err := url.Parse(opts.EndpointURL)
+	up.SiteURL, err = url.Parse(opts.EndpointURL)
 	if err != nil {
-		up.SiteURL = u.Scheme + "://" + u.Host + "/"
-		up.EndpointURI = u.Path
+		errorExit(err)
 	}
 
 	// Execute the database query
