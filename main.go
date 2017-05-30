@@ -18,7 +18,7 @@ var opts struct {
 
 	DbType string `short:"t" long:"db-type" description:"The type of database in which to connect" choice:"mysql" choice:"postgres" choice:"mssql" choice:"sqlite3" default:"mysql" env:"DATASIPPER_DB_TYPE"`
 
-	DbHostname string `short:"h" long:"db-host" description:"The hostname or IP adress of the database server" default:"localhost"  env:"DATASIPPER_DB_HOSTNAME"`
+	DbHostname string `short:"n" long:"db-host" description:"The hostname or IP adress of the database server" default:"localhost"  env:"DATASIPPER_DB_HOSTNAME"`
 
 	DbPort int `short:"r" long:"db-port" description:"The TCP port of the database server" default:"3306"  env:"DATASIPPER_DB_PORT"`
 

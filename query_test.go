@@ -3,9 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"testing"
-
 	"os"
+	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
