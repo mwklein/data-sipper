@@ -64,3 +64,11 @@ Or within the $GOPATH/
 ```bash
 go test github.com/mwklein/data-sipper/
 ```
+
+## Cross-compiling
+There are many methods available to cross-compile the application for different OS and architectures. The method that has been tested on this project is:
+```bash
+go get github.com/karalabe/xgo
+xgo .
+```
+This requires an active docker machine to be available in your environment, and downloads to a fairly large docker image to support the cross-compile. 

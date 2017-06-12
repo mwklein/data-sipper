@@ -50,7 +50,7 @@ $(GOPATH)/bin/$(appname)_darwin_amd64.tar.gz: $(sources)
 windows: $(GOPATH)/bin/$(appname)_windows_386.zip $(GOPATH)/bin/$(appname)_windows_amd64.zip
 
 $(GOPATH)/bin/$(appname)_windows_386.zip: $(sources)
-	$(call $(GOPATH)/bin,windows,386,.exe)
+	$(call build,windows,386,.exe)
 	$(call zip,windows,386,.exe)
 
 $(GOPATH)/bin/$(appname)_windows_amd64.zip: $(sources)
