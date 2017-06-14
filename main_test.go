@@ -12,12 +12,12 @@ func TestMain_ShortArgs(t *testing.T) {
 	os.Args = []string{"data-sipper",
 		"-t", "mysql",
 		"-n", os.Getenv("DATASIPPER_DB_HOSTNAME"),
-		"-p", "8080",
-		"-d", "Something",
-		"-u", "auser",
-		"-p", "auserpassword",
+		"-p", "3306",
+		"-d", "ds_test",
+		"-u", "testuser",
+		"-p", "testpwd",
 		"-q", "\"SELECT * FROM information_schema.tables\"",
-		"-s", "\"https://fgk7jlmhkk.execute-api.us-east-1.amazonaws.com/dev\""}
+		"-s", "\"https://9ijn9bz803.execute-api.us-east-1.amazonaws.com/dev/data/append\""}
 
 	main()
 
@@ -30,12 +30,12 @@ func TestMain_LongArgs(t *testing.T) {
 	os.Args = []string{"data-sipper",
 		"--db-type", "mysql",
 		"--db-host", os.Getenv("DATASIPPER_DB_HOSTNAME"),
-		"--db-port", "8080",
-		"--db-name", "Something",
-		"--db-username", "auser",
-		"--db-password", "auserpassword",
+		"--db-port", "3306",
+		"--db-name", "ds_test",
+		"--db-username", "testuser",
+		"--db-password", "testpwd",
 		"--db-query", "\"SELECT * FROM information_schema.tables\"",
-		"--server", "\"https://fgk7jlmhkk.execute-api.us-east-1.amazonaws.com/dev\""}
+		"--server", "\"https://9ijn9bz803.execute-api.us-east-1.amazonaws.com/dev/data/append\""}
 
 	main()
 
@@ -49,7 +49,7 @@ func TestMain_Sqlite3(t *testing.T) {
 		"-t", "sqlite3",
 		"-f", "./sqlite3_test.db",
 		"-q", "\"SELECT * FROM sqlite_master WHERE type='table'\"",
-		"-s", "\"https://fgk7jlmhkk.execute-api.us-east-1.amazonaws.com/dev\""}
+		"-s", "\"https://9ijn9bz803.execute-api.us-east-1.amazonaws.com/dev/data/append\""}
 
 	main()
 
