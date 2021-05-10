@@ -1,0 +1,69 @@
+version: '2'
+
+services:
+
+  workspace:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      args:
+        - VARIANT=1.16
+        - INSTALL_NODE=false
+        - NODE_VERSION=lts/*
+    networks:
+      - test-net
+    volumes:
+      - ..:/workspace:cached
+    
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  mysql:
+    image: mysql
+    environment:
+    - MYSQL_ROOT_PASSWORD=rootpwd
+    - MYSQL_DATABASE=ds_test
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpwd
+    ports:
+      - "3306:3306"
+    networks:
+      - test-net
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: testpwd
+      POSTGRES_USER: testuser
+      POSTGRES_DB: ds_test
+    ports:
+      - "5432:5432"
+    networks:
+      - test-net
+
+  mssql:
+    image: "microsoft/mssql-server-linux"
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "R00t@ssw0rd"
+    networks:
+      - test-net
+
+#  oracle:
+#    image: "dap1995/oracle-database"
+#    ports:
+#      - "8080:8080"
+#      - "1521:1521"
+#    networks:
+#      - test-net
+
+networks:
+  external: {
+    driver: bridge
+  }
+  test-net: {}

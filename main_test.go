@@ -11,7 +11,7 @@ func TestMain_ShortArgs(t *testing.T) {
 
 	os.Args = []string{"data-sipper",
 		"-t", "mysql",
-		"-n", os.Getenv("DATASIPPER_DB_HOSTNAME"),
+		"-n", "mysql",
 		"-p", "3306",
 		"-d", "ds_test",
 		"-u", "testuser",
@@ -29,7 +29,7 @@ func TestMain_LongArgs(t *testing.T) {
 
 	os.Args = []string{"data-sipper",
 		"--db-type", "mysql",
-		"--db-host", os.Getenv("DATASIPPER_DB_HOSTNAME"),
+		"--db-host", "mysql",
 		"--db-port", "3306",
 		"--db-name", "ds_test",
 		"--db-username", "testuser",
@@ -47,7 +47,7 @@ func TestMain_Sqlite3(t *testing.T) {
 
 	os.Args = []string{"data-sipper",
 		"-t", "sqlite3",
-		"-f", "./sqlite3_test.db",
+		"-f", ".devcontainer/sqlite3_test.db",
 		"-q", "\"SELECT * FROM sqlite_master WHERE type='table'\"",
 		"-s", "\"https://9ijn9bz803.execute-api.us-east-1.amazonaws.com/dev/data/append\""}
 
