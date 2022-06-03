@@ -7,9 +7,8 @@ services:
       context: ./
       dockerfile: ./Dockerfile
       args:
-        - VARIANT=1.16
-        - INSTALL_NODE=false
-        - NODE_VERSION=lts/*
+        - VARIANT=1.17
+        - NODE_VERSION=none
     networks:
       - test-net
     volumes:
@@ -45,7 +44,7 @@ services:
       - test-net
 
   mssql:
-    image: "microsoft/mssql-server-linux"
+    image: "mcr.microsoft.com/mssql/server"
     ports:
       - "1433:1433"
     environment:
