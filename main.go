@@ -79,7 +79,7 @@ func main() {
 	// Execute the database query
 	if !db.ConfigValid() {
 		//fmt.Printf("%v\n", flags.PrintErrors())
-		errorExit(errors.New("Database configuration is not valid"))
+		errorExit(errors.New("database configuration is not valid"))
 	}
 	rows, err := db.ExecuteQuery(opts.DbQuery)
 	if err != nil {
@@ -88,7 +88,7 @@ func main() {
 
 	// Execute the upload to the server
 	if !up.ConfigValid() {
-		errorExit(errors.New("Server configuration is not valid"))
+		errorExit(errors.New("server configuration is not valid"))
 	}
 	err = up.UploadResults(&rows)
 	if err != nil {

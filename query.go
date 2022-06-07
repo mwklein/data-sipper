@@ -229,7 +229,7 @@ func makeStructJSON(rows *sql.Rows) ([]interface{}, error) {
 				curRow[columns[i]] = string(t)
 			default:
 				fmt.Printf("Row=%d cname=%s type=%s value=%s\n", len(masterData), columns[i], t, v)
-				return nil, errors.New("Unknown DB Type to convert to JSON")
+				return nil, errors.New("unknown DB Type to convert to JSON")
 			}
 
 		}
