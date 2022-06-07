@@ -4,7 +4,6 @@ appname := data-sipper
 sources := $(wildcard *.go)
 
 build = GOOS=$(1) GOARCH=$(2) go build -o $(GOPATH)/bin/$(appname)$(3)
-build_sqlite3 = cd $(GOPATH)/src/github.com/mattn/go-sqlite3 && go build --tags "libsqlite3 $(1)"
 tar = cd $(GOPATH)/bin && tar -cvzf $(appname)_$(1)_$(2).tar.gz $(appname)$(3) && rm $(appname)$(3)
 zip = cd $(GOPATH)/bin && zip $(appname)_$(1)_$(2).zip $(appname)$(3) && rm $(appname)$(3)
 
@@ -20,22 +19,18 @@ clean:
 linux: $(GOPATH)/bin/$(appname)_linux_arm.tar.gz $(GOPATH)/bin/$(appname)_linux_arm64.tar.gz $(GOPATH)/bin/$(appname)_linux_386.tar.gz $(GOPATH)/bin/$(appname)_linux_amd64.tar.gz
 
 $(GOPATH)/bin/$(appname)_linux_386.tar.gz: $(sources)
-	$(call build_sqlite3,linux,386,)
 	$(call build,linux,386,)
 	$(call tar,linux,386)
 
 $(GOPATH)/bin/$(appname)_linux_amd64.tar.gz: $(sources)
-	$(call build_sqlite3,linux,amd64,)
 	$(call build,linux,amd64,)
 	$(call tar,linux,amd64)
 
 $(GOPATH)/bin/$(appname)_linux_arm.tar.gz: $(sources)
-	$(call build_sqlite3,linux,arm,)
 	$(call build,linux,arm,)
 	$(call tar,linux,arm)
 
 $(GOPATH)/bin/$(appname)_linux_arm64.tar.gz: $(sources)
-	$(call build_sqlite3,linux,arm64,)
 	$(call build,linux,arm64,)
 	$(call tar,linux,arm64)
 

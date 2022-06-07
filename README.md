@@ -38,9 +38,17 @@ go test
 ```
 
 ## Cross-compiling
-There are many methods available to cross-compile the application for different OS and architectures. The method that has been tested on this project is:
+The following is how to build the project for multiple architecture. This is method is currently untested:
 ```bash
-go get github.com/karalabe/xgo
-xgo .
+# Build all
+make
+
+# Build linux
+make linux
+
+# Build mac
+make darwin
+
+# Build windows
+make windows
 ```
-This requires an active docker machine to be available in your environment, and downloads to a fairly large docker image to support the cross-compile. 
