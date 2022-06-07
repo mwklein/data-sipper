@@ -88,7 +88,7 @@ func TestExecuteQuery_Generic(t *testing.T) {
 func TestExecuteQuery_MySQL(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbName = "ds_test"
-	db.hostname = "mysql"
+	db.hostname = "localhost"
 	db.username = "testuser"
 	db.password = "testpwd"
 
@@ -110,7 +110,7 @@ func TestExecuteQuery_MySQL(t *testing.T) {
 func TestExecuteQuery_Postgres(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbType = "postgres"
-	db.hostname = "postgres"
+	db.hostname = "localhost"
 	db.port = 5432
 	db.dbName = "ds_test"
 	db.username = "testuser"
@@ -157,7 +157,7 @@ func TestExecuteQuery_MSSQL(t *testing.T) {
 func TestExecuteQuery_Sqlite3(t *testing.T) {
 	db := DefaultDbConfig()
 	db.dbType = "sqlite3"
-	db.filePath = ".devcontainer/sqlite3_test.db"
+	db.filePath = "./sqlite3_test.db"
 
 	results, err := db.ExecuteQuery("SELECT * FROM sqlite_master WHERE type='table'")
 	if err != nil {
