@@ -55,7 +55,7 @@ func TestExecuteQuery_Generic(t *testing.T) {
 	if !found {
 		t.Error("error parsing map[string]interface{} of json")
 	}
-	if row0["id"] != 1 {
+	if row0["id"] != int64(1) {
 		t.Error("expected row 0 to have id=1")
 	}
 	if row0["title"] != "one" {
@@ -67,7 +67,7 @@ func TestExecuteQuery_Generic(t *testing.T) {
 	if !found {
 		t.Error("error parsing map[string]interface{} of json")
 	}
-	if row1["id"] != 2 {
+	if row1["id"] != int64(2) {
 		t.Error("expected row 1 to have id=2")
 	}
 	if row1["title"] != "two" {
